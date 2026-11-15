@@ -1,3 +1,11 @@
-const e = require('express'); const r = e.Router(); const c = require('../controllers/supplierController');
-r.get('/', c.getAll); r.get('/:id', c.getOne); r.post('/', c.create); r.put('/:id', c.update); r.delete('/:id', c.remove);
-module.exports = r;
+const express = require('express');
+const router = express.Router();
+const supplierController = require('../controllers/supplierController');
+
+router.get('/', supplierController.getAll);
+router.get('/:id', supplierController.getOne);
+router.post('/', supplierController.create);
+router.put('/:id', supplierController.update);
+router.delete('/:id', supplierController.remove);
+
+module.exports = router;

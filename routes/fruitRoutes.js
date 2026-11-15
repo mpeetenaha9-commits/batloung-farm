@@ -1,4 +1,13 @@
-const e = require('express'); const r = e.Router(); const c = require('../controllers/fruitController');
-r.get('/', c.getAll); r.post('/', c.create); r.put('/:id', c.update);
-r.get('/stock/all', c.getAllStock); r.get('/stock/low', c.getLowStock); r.get('/:id/stock', c.getStock);
-module.exports = r;
+const express = require('express');
+const router = express.Router();
+const fruitController = require('../controllers/fruitController');
+
+router.get('/', fruitController.getAll);
+router.post('/', fruitController.create);
+router.put('/:id', fruitController.update);
+
+router.get('/stock/all', fruitController.getAllStock);
+router.get('/stock/low', fruitController.getLowStock);
+router.get('/:id/stock', fruitController.getStock);
+
+module.exports = router;

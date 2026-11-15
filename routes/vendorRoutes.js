@@ -1,3 +1,10 @@
-const e = require('express'); const r = e.Router(); const c = require('../controllers/vendorController');
-r.get('/', c.getAll); r.get('/search', c.search); r.post('/', c.create); r.put('/:id', c.update);
-module.exports = r;
+const express = require('express');
+const router = express.Router();
+const vendorController = require('../controllers/vendorController');
+
+router.get('/', vendorController.getAll);
+router.get('/search', vendorController.search);
+router.post('/', vendorController.create);
+router.put('/:id', vendorController.update);
+
+module.exports = router;

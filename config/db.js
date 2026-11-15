@@ -9,16 +9,17 @@ const pool = mysql.createPool({
   port: process.env.DB_PORT,
   waitForConnections: true,
   connectionLimit: 10,
-  queueLimit: 0
+  queueLimit: 0,
+  multipleStatements: true // 🚨 THIS FIXES THE SQL SYNTAX ERROR
 });
 
 (async () => {
   try {
     const conn = await pool.getConnection();
-    console.log(' MySQL connected');
+    console.log('✅ MySQL connected');
     conn.release();
   } catch (err) {
-    console.error(' MySQL failed:', err.message);
+    console.error('❌ MySQL failed:', err.message);
   }
 })();
 

@@ -1,4 +1,4 @@
-CREATE TABLE suppliers (
+CREATE TABLE IF NOT EXISTS suppliers (
   supplier_id   INT AUTO_INCREMENT PRIMARY KEY,
   business_name VARCHAR(120) NOT NULL UNIQUE,
   contact_person VARCHAR(120) NOT NULL,
@@ -6,27 +6,27 @@ CREATE TABLE suppliers (
   province      ENUM('Gauteng','Free State','KwaZulu-Natal','Western Cape','Eastern Cape','Limpopo','Mpumalanga','North West') NOT NULL,
   address       VARCHAR(255) NOT NULL
 );
-CREATE TABLE fruits (
+CREATE TABLE IF NOT EXISTS fruits (
   fruit_id    INT AUTO_INCREMENT PRIMARY KEY,
   fruit_name  VARCHAR(60) NOT NULL UNIQUE,
   description VARCHAR(255),
   status      ENUM('available','discontinued') NOT NULL DEFAULT 'available'
 );
-CREATE TABLE vendors (
+CREATE TABLE IF NOT EXISTS vendors (
   vendor_id      INT AUTO_INCREMENT PRIMARY KEY,
   vendor_name    VARCHAR(120) NOT NULL,
   phone_number   VARCHAR(20)  NOT NULL UNIQUE,
   location       VARCHAR(120) NOT NULL,
   registration_date DATE NOT NULL
 );
-CREATE TABLE purchases (
+CREATE TABLE IF NOT EXISTS purchases (
   purchase_id   INT AUTO_INCREMENT PRIMARY KEY,
   supplier_id   INT NOT NULL,
   purchase_date DATE NOT NULL,
   total_amount  DECIMAL(12,2) NOT NULL DEFAULT 0.00,
   CONSTRAINT fk_purchase_supplier FOREIGN KEY (supplier_id) REFERENCES suppliers(supplier_id) ON DELETE RESTRICT
 );
-CREATE TABLE purchase_details (
+CREATE TABLE IF NOT EXISTS purchase_details (
   purchase_detail_id INT AUTO_INCREMENT PRIMARY KEY,
   purchase_id  INT NOT NULL,
   fruit_id     INT NOT NULL,
@@ -36,7 +36,7 @@ CREATE TABLE purchase_details (
   CONSTRAINT fk_pd_purchase FOREIGN KEY (purchase_id) REFERENCES purchases(purchase_id) ON DELETE CASCADE,
   CONSTRAINT fk_pd_fruit FOREIGN KEY (fruit_id) REFERENCES fruits(fruit_id) ON DELETE RESTRICT
 );
-CREATE TABLE sales (
+CREATE TABLE IF NOT EXISTS sales (
   sale_id      INT AUTO_INCREMENT PRIMARY KEY,
   vendor_id    INT NOT NULL,
   sale_date    DATE NOT NULL,
@@ -46,7 +46,7 @@ CREATE TABLE sales (
   total_amount DECIMAL(12,2) NOT NULL DEFAULT 0.00,
   CONSTRAINT fk_sale_vendor FOREIGN KEY (vendor_id) REFERENCES vendors(vendor_id) ON DELETE RESTRICT
 );
-CREATE TABLE sales_details (
+CREATE TABLE IF NOT EXISTS sales_details (
   sales_detail_id INT AUTO_INCREMENT PRIMARY KEY,
   sale_id      INT NOT NULL,
   fruit_id     INT NOT NULL,
@@ -56,7 +56,7 @@ CREATE TABLE sales_details (
   CONSTRAINT fk_sd_sale FOREIGN KEY (sale_id) REFERENCES sales(sale_id) ON DELETE CASCADE,
   CONSTRAINT fk_sd_fruit FOREIGN KEY (fruit_id) REFERENCES fruits(fruit_id) ON DELETE RESTRICT
 );
-CREATE TABLE stock (
+CREATE TABLE IF NOT EXISTS stock (
   stock_id   INT AUTO_INCREMENT PRIMARY KEY,
   fruit_id   INT NOT NULL,
   packaging_size ENUM('small','medium','large') NOT NULL,

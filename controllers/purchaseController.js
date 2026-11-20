@@ -66,3 +66,10 @@ exports.deletePurchase = async (req, res, next) => {
     conn.release();
   }
 };
+
+exports.updatePurchase = async (req, res, next) => {
+  try {
+    await db.query('UPDATE purchases SET purchase_date = ? WHERE purchase_id = ?', [req.body.purchase_date, req.params.id]);
+    res.json({ success: true, message: 'Purchase date updated' });
+  } catch (e) { next(e); }
+};

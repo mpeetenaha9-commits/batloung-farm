@@ -60,6 +60,35 @@ module.exports = {
      ON DUPLICATE KEY UPDATE available_quantity = available_quantity + VALUES(available_quantity)`,
     [fid, size, qty]
   ),
+  getPurchases: () => db.query(
+    `SELECT p.purchase_id, p.supplier_id, p.purchase_date, p.total_amount,
+            s.business_name AS supplier_name, s.province AS supplier_province,
+            COUNT(pd.detail_id) AS item_count,
+            COALESCE(SUM(pd.quantity), 0) AS total_boxes
+     FROM purchases p
+     LEFT JOIN suppliers s ON s.supplier_id = p.supplier_id
+     LEFT JOIN purchase_details pd ON pd.purchase_id = p.purchase_id
+     GROUP BY p.purchase_id
+     ORDER BY p.purchase_date DESC, p.purchase_id DESC`
+  ),
+  getPurchaseById: (id) => db.query(
+    `SELECT p.purchase_id, p.supplier_id, p.purchase_date, p.total_amount,
+            s.business_name AS supplier_name, s.contact_person, s.phone,
+            s.province, s.address
+     FROM purchases p
+     LEFT JOIN suppliers s ON s.supplier_id = p.supplier_id
+     WHERE p.purchase_id = ?`, [id]
+  ),
+  getPurchaseDetails: (id) => db.query(
+    `SELECT pd.detail_id, pd.fruit_id, pd.quantity, pd.unit_cost, pd.packaging_size,
+            f.fruit_name
+     FROM purchase_details pd
+     LEFT JOIN fruits f ON f.fruit_id = pd.fruit_id
+     WHERE pd.purchase_id = ?
+     ORDER BY pd.detail_id`, [id]
+  ),
+  deletePurchase: (c, id) => c.query('DELETE FROM purchases WHERE purchase_id = ?', [id]),
+  deletePurchaseDetails: (c, id) => c.query('DELETE FROM purchase_details WHERE purchase_id = ?', [id]),
 
   // SALES
   createSale: (c, vid, d, method, status, paid) => c.query(

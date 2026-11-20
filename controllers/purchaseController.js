@@ -1,5 +1,6 @@
 const db = require('../config/db');
 const q = require('../models/queries');
+
 exports.createPurchase = async (req, res, next) => {
   const conn = await db.getConnection();
   try {
@@ -20,6 +21,44 @@ exports.createPurchase = async (req, res, next) => {
     await q.updatePurchaseTotal(conn, p.insertId, total);
     await conn.commit();
     res.status(201).json({ success:true, purchase_id: p.insertId, total_amount: total });
+  } catch (e) {
+    await conn.rollback();
+    next(e);
+  } finally {
+    conn.release();
+  }
+};
+
+exports.getPurchases = async (req, res, next) => {
+  try {
+    const [rows] = await q.getPurchases();
+    res.json({ success: true, data: rows });
+  } catch (e) { next(e); }
+};
+
+exports.getPurchaseById = async (req, res, next) => {
+  try {
+    const [head] = await q.getPurchaseById(req.params.id);
+    if (!head.length) return res.status(404).json({ success: false, message: 'Purchase not found' });
+    const [items] = await q.getPurchaseDetails(req.params.id);
+    res.json({ success: true, data: { ...head[0], items } });
+  } catch (e) { next(e); }
+};
+
+exports.deletePurchase = async (req, res, next) => {
+  const conn = await db.getConnection();
+  try {
+    await conn.beginTransaction();
+    const [head] = await q.getPurchaseById(req.params.id);
+    if (!head.length) { await conn.rollback(); return res.status(404).json({ success: false, message: 'Purchase not found' }); }
+    const [items] = await q.getPurchaseDetails(req.params.id);
+    for (const it of items) {
+      await q.upsertStockIncrease(conn, it.fruit_id, it.packaging_size, -it.quantity);
+    }
+    await q.deletePurchaseDetails(conn, req.params.id);
+    await q.deletePurchase(conn, req.params.id);
+    await conn.commit();
+    res.json({ success: true, message: 'Purchase deleted and stock reversed' });
   } catch (e) {
     await conn.rollback();
     next(e);
